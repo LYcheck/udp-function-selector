@@ -3,6 +3,6 @@
 #include<stdlib.h> //exit(0);
 
 int main(void){
-    printf("LEEESSSSGOOOOOOO\n");
+    printf("Execution test success!\n");
 	return 0;
 }

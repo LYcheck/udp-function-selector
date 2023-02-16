@@ -6,7 +6,7 @@
 
 #define SERVER "127.0.0.1"
 #define BUFLEN 512	//Max length of buffer
-#define PORT 8888	//The port on which to send data
+#define PORT 1111	//The port on which to send data
 
 void die(char *s)
 {
