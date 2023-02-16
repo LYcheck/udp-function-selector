@@ -5,7 +5,7 @@
 #include<sys/socket.h>
 #include<unistd.h>
 
-#define BUFLEN 512	//Max length of buffer
+#define BUFLEN 512
 
 void die(char *s) {
 	perror(s);
@@ -33,43 +33,32 @@ int main(int argc, char **argv) {
         }
     }
 
-	struct sockaddr_in si_me, si_other;
-	
+	struct sockaddr_in si_other;
 	int s, i, slen = sizeof(si_other) , recv_len;
 	char buf[BUFLEN];
 	
-	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-		die("socket create");
-	}
+	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) die("socket create");
 	
-	memset((char *) &si_me, 0, sizeof(si_me));
-	
-	si_me.sin_family = AF_INET;
-	si_me.sin_port = htons(port);
-	si_me.sin_addr.s_addr = htonl(INADDR_ANY);
-	
-	if(bind(s , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) {
-		die("socket bind");
-	}
+	struct sockaddr_in si_me = {
+		.sin_family = AF_INET,
+		.sin_port = htons(port),
+		.sin_addr.s_addr = htonl(INADDR_ANY) 
+	};
+
+	if(bind(s , (struct sockaddr*)&si_me, sizeof(si_me) ) == -1) die("socket bind");
 
 	printf("Server listening on port %d...\n", port);
 
 	while(1) {	
-		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1) {
-			die("recvfrom()");
-		}
-
+		if ((recv_len = recvfrom(s, buf, BUFLEN, 0, (struct sockaddr *) &si_other, &slen)) == -1) die("recvfrom()");
 		if(func) system(func);
 		
-		// dump conn data
 		printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
 		
 		char *res = "Function executed";
-		if (sendto(s, res, 20, 0, (struct sockaddr*) &si_other, slen) == -1) {
-			die("sendto()");
-		}
+		if (sendto(s, res, 20, 0, (struct sockaddr*) &si_other, slen) == -1) die("sendto()");
 	}
 
-	// close(s);
+	close(s);
 	return 0;
 }
